@@ -1,8 +1,5 @@
 from allauth.socialaccount.adapter import get_adapter
 from django.conf import settings
-from django.utils.functional import SimpleLazyObject
-
-from .models import Favorite
 
 
 def social_auth(request):
@@ -15,13 +12,3 @@ def social_auth(request):
         'show_setup_hints': settings.DEBUG,
     }
 
-
-def favorites(request):
-    user = getattr(request, 'user', None)
-    if user is None or not user.is_authenticated:
-        return {'favorite_ids': set()}
-    return {
-        'favorite_ids': SimpleLazyObject(
-            lambda: set(Favorite.objects.filter(user=user).values_list('movie_id', flat=True))
-        )
-    }
