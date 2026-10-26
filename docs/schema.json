@@ -1,0 +1,844 @@
+{
+ "tables": {
+  "auth_user": {
+   "model": "User",
+   "verbose": "пользователь",
+   "kind": "user",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "password",
+     "type": "VARCHAR(128)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "пароль"
+    },
+    {
+     "name": "username",
+     "type": "VARCHAR(150)",
+     "key": "UQ",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "имя пользователя"
+    },
+    {
+     "name": "first_name",
+     "type": "VARCHAR(150)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "имя"
+    },
+    {
+     "name": "last_name",
+     "type": "VARCHAR(150)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "фамилия"
+    },
+    {
+     "name": "email",
+     "type": "VARCHAR(254)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "адрес электронной почты"
+    },
+    {
+     "name": "is_staff",
+     "type": "BOOLEAN",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "статус персонала"
+    },
+    {
+     "name": "is_active",
+     "type": "BOOLEAN",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "активный"
+    },
+    {
+     "name": "date_joined",
+     "type": "TIMESTAMPTZ",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "дата регистрации"
+    }
+   ]
+  },
+  "cinema_category": {
+   "model": "Category",
+   "verbose": "Жанр",
+   "kind": "lookup",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "name",
+     "type": "VARCHAR(100)",
+     "key": "UQ",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Название"
+    },
+    {
+     "name": "description",
+     "type": "TEXT",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Описание"
+    },
+    {
+     "name": "created_at",
+     "type": "TIMESTAMPTZ",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Создан"
+    }
+   ]
+  },
+  "cinema_country": {
+   "model": "Country",
+   "verbose": "Страна",
+   "kind": "lookup",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "name",
+     "type": "VARCHAR(100)",
+     "key": "UQ",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Название"
+    },
+    {
+     "name": "code",
+     "type": "VARCHAR(2)",
+     "key": "UQ",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Код ISO"
+    }
+   ]
+  },
+  "cinema_subscriptionplan": {
+   "model": "SubscriptionPlan",
+   "verbose": "Тариф подписки",
+   "kind": "lookup",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "name",
+     "type": "VARCHAR(100)",
+     "key": "UQ",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Название"
+    },
+    {
+     "name": "price",
+     "type": "DECIMAL(8,2)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Цена, ₽"
+    },
+    {
+     "name": "duration_days",
+     "type": "INTEGER",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Срок действия, дней"
+    },
+    {
+     "name": "description",
+     "type": "TEXT",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Описание"
+    },
+    {
+     "name": "is_active",
+     "type": "BOOLEAN",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Доступен для покупки"
+    }
+   ]
+  },
+  "cinema_person": {
+   "model": "Person",
+   "verbose": "Персона",
+   "kind": "main",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "full_name",
+     "type": "VARCHAR(200)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Имя и фамилия"
+    },
+    {
+     "name": "birth_date",
+     "type": "DATE",
+     "key": "",
+     "null": "NULL",
+     "target": "",
+     "verbose": "Дата рождения"
+    },
+    {
+     "name": "photo",
+     "type": "VARCHAR(100)",
+     "key": "",
+     "null": "NULL",
+     "target": "",
+     "verbose": "Фото"
+    },
+    {
+     "name": "biography",
+     "type": "TEXT",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Биография"
+    },
+    {
+     "name": "wiki_url",
+     "type": "VARCHAR(200)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Ссылка на Википедию"
+    },
+    {
+     "name": "created_at",
+     "type": "TIMESTAMPTZ",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Добавлен"
+    }
+   ]
+  },
+  "cinema_movie": {
+   "model": "Movie",
+   "verbose": "Фильм",
+   "kind": "main",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "title",
+     "type": "VARCHAR(255)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Название"
+    },
+    {
+     "name": "original_title",
+     "type": "VARCHAR(255)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Оригинальное название"
+    },
+    {
+     "name": "description",
+     "type": "TEXT",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Описание"
+    },
+    {
+     "name": "release_year",
+     "type": "INTEGER",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Год выпуска"
+    },
+    {
+     "name": "premiere_date",
+     "type": "DATE",
+     "key": "",
+     "null": "NULL",
+     "target": "",
+     "verbose": "Дата премьеры на сайте"
+    },
+    {
+     "name": "duration_minutes",
+     "type": "INTEGER",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Продолжительность (мин)"
+    },
+    {
+     "name": "category_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NULL",
+     "target": " → cinema_category",
+     "verbose": "Жанр"
+    },
+    {
+     "name": "age_rating",
+     "type": "VARCHAR(3)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Возрастной рейтинг"
+    },
+    {
+     "name": "access",
+     "type": "VARCHAR(12)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Доступ"
+    },
+    {
+     "name": "status",
+     "type": "VARCHAR(10)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Статус"
+    },
+    {
+     "name": "poster",
+     "type": "VARCHAR(100)",
+     "key": "",
+     "null": "NULL",
+     "target": "",
+     "verbose": "Постер"
+    },
+    {
+     "name": "trailer_url",
+     "type": "VARCHAR(200)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Ссылка на трейлер"
+    },
+    {
+     "name": "subtitles",
+     "type": "VARCHAR(100)",
+     "key": "",
+     "null": "NULL",
+     "target": "",
+     "verbose": "Файл субтитров"
+    },
+    {
+     "name": "views_count",
+     "type": "INTEGER",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Количество просмотров"
+    },
+    {
+     "name": "created_at",
+     "type": "TIMESTAMPTZ",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Добавлен"
+    },
+    {
+     "name": "updated_at",
+     "type": "TIMESTAMPTZ",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Изменён"
+    },
+    {
+     "name": "created_by_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NULL",
+     "target": " → auth_user",
+     "verbose": "Кто добавил"
+    }
+   ]
+  },
+  "cinema_moviecredit": {
+   "model": "MovieCredit",
+   "verbose": "Участие в фильме",
+   "kind": "link",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "movie_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → cinema_movie",
+     "verbose": "Фильм"
+    },
+    {
+     "name": "person_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → cinema_person",
+     "verbose": "Персона"
+    },
+    {
+     "name": "role",
+     "type": "VARCHAR(10)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Роль в фильме"
+    },
+    {
+     "name": "character_name",
+     "type": "VARCHAR(200)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Имя персонажа"
+    },
+    {
+     "name": "order",
+     "type": "SMALLINT",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Порядок в титрах"
+    }
+   ]
+  },
+  "cinema_review": {
+   "model": "Review",
+   "verbose": "Отзыв",
+   "kind": "main",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "movie_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → cinema_movie",
+     "verbose": "Фильм"
+    },
+    {
+     "name": "user_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → auth_user",
+     "verbose": "Автор"
+    },
+    {
+     "name": "text",
+     "type": "TEXT",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Текст отзыва"
+    },
+    {
+     "name": "rating",
+     "type": "INTEGER",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Оценка (1-10)"
+    },
+    {
+     "name": "is_approved",
+     "type": "BOOLEAN",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Одобрен модератором"
+    },
+    {
+     "name": "created_at",
+     "type": "TIMESTAMPTZ",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Создан"
+    },
+    {
+     "name": "updated_at",
+     "type": "TIMESTAMPTZ",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Изменён"
+    }
+   ]
+  },
+  "cinema_playlist": {
+   "model": "Playlist",
+   "verbose": "Плейлист",
+   "kind": "main",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "user_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → auth_user",
+     "verbose": "Владелец"
+    },
+    {
+     "name": "name",
+     "type": "VARCHAR(255)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Название плейлиста"
+    },
+    {
+     "name": "description",
+     "type": "TEXT",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Описание"
+    },
+    {
+     "name": "is_public",
+     "type": "BOOLEAN",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Публичный"
+    },
+    {
+     "name": "created_at",
+     "type": "TIMESTAMPTZ",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Создан"
+    }
+   ]
+  },
+  "cinema_favorite": {
+   "model": "Favorite",
+   "verbose": "Избранное",
+   "kind": "main",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "user_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → auth_user",
+     "verbose": "Пользователь"
+    },
+    {
+     "name": "movie_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → cinema_movie",
+     "verbose": "Фильм"
+    },
+    {
+     "name": "created_at",
+     "type": "TIMESTAMPTZ",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Добавлено"
+    }
+   ]
+  },
+  "cinema_subscription": {
+   "model": "Subscription",
+   "verbose": "Подписка",
+   "kind": "main",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "user_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → auth_user",
+     "verbose": "Пользователь"
+    },
+    {
+     "name": "plan_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → cinema_subscriptionplan",
+     "verbose": "Тариф"
+    },
+    {
+     "name": "started_at",
+     "type": "TIMESTAMPTZ",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Начало действия"
+    },
+    {
+     "name": "expires_at",
+     "type": "TIMESTAMPTZ",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Окончание действия"
+    },
+    {
+     "name": "price_paid",
+     "type": "DECIMAL(8,2)",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Оплачено, ₽"
+    },
+    {
+     "name": "auto_renew",
+     "type": "BOOLEAN",
+     "key": "",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "Автопродление"
+    }
+   ]
+  },
+  "cinema_movie_countries": {
+   "model": "Movie_countries",
+   "verbose": "Связь фильм — страна (M:N)",
+   "kind": "auto",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "movie_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → cinema_movie",
+     "verbose": "movie"
+    },
+    {
+     "name": "country_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → cinema_country",
+     "verbose": "country"
+    }
+   ]
+  },
+  "cinema_playlist_movies": {
+   "model": "Playlist_movies",
+   "verbose": "Связь плейлист — фильм (M:N)",
+   "kind": "auto",
+   "rows": [
+    {
+     "name": "id",
+     "type": "BIGSERIAL",
+     "key": "PK",
+     "null": "NOT NULL",
+     "target": "",
+     "verbose": "ID"
+    },
+    {
+     "name": "playlist_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → cinema_playlist",
+     "verbose": "playlist"
+    },
+    {
+     "name": "movie_id",
+     "type": "BIGINT",
+     "key": "FK",
+     "null": "NOT NULL",
+     "target": " → cinema_movie",
+     "verbose": "movie"
+    }
+   ]
+  }
+ },
+ "edges": [
+  [
+   "cinema_category",
+   "cinema_movie",
+   "category_id"
+  ],
+  [
+   "auth_user",
+   "cinema_movie",
+   "created_by_id"
+  ],
+  [
+   "cinema_movie",
+   "cinema_moviecredit",
+   "movie_id"
+  ],
+  [
+   "cinema_person",
+   "cinema_moviecredit",
+   "person_id"
+  ],
+  [
+   "cinema_movie",
+   "cinema_review",
+   "movie_id"
+  ],
+  [
+   "auth_user",
+   "cinema_review",
+   "user_id"
+  ],
+  [
+   "auth_user",
+   "cinema_playlist",
+   "user_id"
+  ],
+  [
+   "auth_user",
+   "cinema_favorite",
+   "user_id"
+  ],
+  [
+   "cinema_movie",
+   "cinema_favorite",
+   "movie_id"
+  ],
+  [
+   "auth_user",
+   "cinema_subscription",
+   "user_id"
+  ],
+  [
+   "cinema_subscriptionplan",
+   "cinema_subscription",
+   "plan_id"
+  ],
+  [
+   "cinema_movie",
+   "cinema_movie_countries",
+   "movie_id"
+  ],
+  [
+   "cinema_country",
+   "cinema_movie_countries",
+   "country_id"
+  ],
+  [
+   "cinema_playlist",
+   "cinema_playlist_movies",
+   "playlist_id"
+  ],
+  [
+   "cinema_movie",
+   "cinema_playlist_movies",
+   "movie_id"
+  ]
+ ]
+}
