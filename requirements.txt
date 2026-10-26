@@ -1,0 +1,16 @@
+asgiref==3.11.1
+Django==6.0.6
+djangorestframework==3.17.1
+sqlparse==0.5.5
+tzdata==2026.2
+psycopg2-binary==2.9.12
+redis==8.0.1
+drf-spectacular==0.29.0
+django-allauth[socialaccount]==65.18.0
+dj-rest-auth==7.2.0
+celery==5.6.3
+django-filter==26.2
+python-dotenv==1.2.3
+faker==40.23.0
+Pillow==12.3.0
+reportlab==5.0.1

@@ -1,0 +1,77 @@
+x-app-env: &app-env
+  DB_ENGINE: postgres
+  DB_NAME: cinema_db
+  DB_USER: cinema_user
+  DB_PASSWORD: cinema_password
+  DB_HOST: db
+  DB_PORT: "5432"
+  REDIS_URL: redis://redis:6379
+  EMAIL_HOST: mailhog
+  EMAIL_PORT: "1025"
+
+x-app-build: &app-build
+  context: .
+  args:
+    PYTHON_IMAGE: ${PYTHON_IMAGE:-mirror.gcr.io/library/python:3.12-slim}
+    PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+
+services:
+  web:
+    build: *app-build
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  celery:
+    build: *app-build
+    command: celery -A core worker -l info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  db:
+    image: ${POSTGRES_IMAGE:-mirror.gcr.io/library/postgres:14}
+    environment:
+      POSTGRES_DB: cinema_db
+      POSTGRES_USER: cinema_user
+      POSTGRES_PASSWORD: cinema_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cinema_user -d cinema_db"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: ${REDIS_IMAGE:-mirror.gcr.io/library/redis:alpine}
+    ports:
+      - "6379:6379"
+
+  mailhog:
+    image: ${MAILHOG_IMAGE:-mirror.gcr.io/mailhog/mailhog}
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+volumes:
+  postgres_data:
