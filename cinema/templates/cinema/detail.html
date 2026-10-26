@@ -1,0 +1,144 @@
+{% extends 'cinema/base.html' %}
+{% load cinema_extras %}
+{% block title %}{{ movie.title }}{% endblock %}
+{% block content %}
+<div class="print-only print-header">
+  <b>Cinema — карточка фильма</b> · распечатано {{ printed_at|date:"d.m.Y H:i" }}<br>
+  <span class="print-url" data-url="{{ page_url }}">Адрес: </span>
+</div>
+
+<nav aria-label="Навигационная цепочка" class="no-print">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'catalog' %}">Каталог</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ movie.title }}</li>
+  </ol>
+</nav>
+
+<article class="row g-4" aria-labelledby="movie-title">
+  <div class="col-md-4 col-lg-3">
+    <div class="movie-hero-poster poster-wrap">
+      {% if movie.poster %}<img src="{{ movie.poster.url }}" alt="Постер фильма «{{ movie.title }}»">{% else %}<div class="poster-placeholder" aria-hidden="true">{{ movie.title|slice:":1" }}</div>{% endif %}
+    </div>
+    <div class="d-grid gap-2 mt-3 no-print">
+      {% if can_watch %}
+        {% if movie.trailer_url %}<a class="btn btn-accent" href="{{ movie.trailer_url }}" target="_blank" rel="noopener"><i class="bi bi-play-fill" aria-hidden="true"></i> Смотреть трейлер</a>{% endif %}
+      {% else %}
+        <a class="btn btn-accent" href="{% url 'profile' %}#plans"><i class="bi bi-lock" aria-hidden="true"></i> Доступно по подписке</a>
+      {% endif %}
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'movie-page-favorite' movie.pk %}" class="d-grid">
+          {% csrf_token %}
+          <button class="btn btn-outline-light" type="submit">{% if movie.is_favorite %}<i class="bi bi-heart-fill text-accent" aria-hidden="true"></i> В избранном{% else %}<i class="bi bi-heart" aria-hidden="true"></i> В избранное{% endif %}</button>
+        </form>
+      {% endif %}
+      <button type="button" class="btn btn-outline-light" data-print><i class="bi bi-printer" aria-hidden="true"></i> Печать / сохранить в PDF</button>
+      {% if user.is_staff %}
+        <div class="btn-group">
+          <a class="btn btn-sm btn-outline-warning" href="{% url 'movie-edit' movie.pk %}">Изменить</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'movie-delete' movie.pk %}">Удалить</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-md-8 col-lg-9">
+    <h1 id="movie-title" class="h2 mb-1">{{ movie.title }} <span class="text-secondary fw-normal">({{ movie.release_year }})</span></h1>
+    {% if movie.original_title %}<p class="text-secondary mb-2">{{ movie.original_title }}</p>{% endif %}
+    <p class="mb-3">
+      <span class="badge text-bg-dark border">{{ movie.age_rating }}</span>
+      <span class="badge {% if movie.access == 'free' %}badge-free{% else %}text-bg-secondary{% endif %}">{{ movie.get_access_display }}</span>
+      {% if movie.is_new %}<span class="badge badge-new">Новинка</span>{% endif %}
+      {% if movie.is_coming_soon %}<span class="badge badge-soon">Премьера через {{ movie.days_until_premiere }} дн.</span>{% endif %}
+      {% if movie.status == 'draft' %}<span class="badge text-bg-warning">Черновик</span>{% endif %}
+    </p>
+    <dl class="row facts mb-3">
+      <dt class="col-sm-4 col-lg-3">Рейтинг</dt>
+      <dd class="col-sm-8 col-lg-9">{% if movie.avg_rating %}<span class="rating">★ {{ movie.avg_rating|floatformat:1 }}</span> / 10 · {{ movie.reviews_count }} отз.{% else %}пока нет оценок{% endif %}</dd>
+      <dt class="col-sm-4 col-lg-3">Жанр</dt>
+      <dd class="col-sm-8 col-lg-9">{% if movie.category %}<a href="{{ movie.category.get_absolute_url }}">{{ movie.category.name }}</a>{% else %}—{% endif %}</dd>
+      <dt class="col-sm-4 col-lg-3">Страны</dt>
+      <dd class="col-sm-8 col-lg-9">{% for country in movie.countries.all %}{{ country.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</dd>
+      <dt class="col-sm-4 col-lg-3">Режиссёр</dt>
+      <dd class="col-sm-8 col-lg-9">{% for credit in directors %}<a href="{{ credit.person.get_absolute_url }}">{{ credit.person.full_name }}</a>{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</dd>
+      <dt class="col-sm-4 col-lg-3">Длительность</dt>
+      <dd class="col-sm-8 col-lg-9">{{ movie.formatted_duration }}</dd>
+      <dt class="col-sm-4 col-lg-3">Премьера на сайте</dt>
+      <dd class="col-sm-8 col-lg-9">{{ movie.premiere_date|date:"j E Y"|default:"—" }}</dd>
+      <dt class="col-sm-4 col-lg-3">Просмотров</dt>
+      <dd class="col-sm-8 col-lg-9">{{ movie.views_count }}</dd>
+      {% if movie.subtitles %}
+        <dt class="col-sm-4 col-lg-3">Субтитры</dt>
+        <dd class="col-sm-8 col-lg-9"><a href="{{ movie.subtitles.url }}" download><i class="bi bi-download" aria-hidden="true"></i> Скачать файл субтитров</a></dd>
+      {% endif %}
+    </dl>
+    <h2 class="h5">О фильме</h2>
+    <p>{{ movie.description|linebreaksbr }}</p>
+
+    {% if cast or crew %}
+    <section class="mt-4" aria-labelledby="cast-title">
+      <h2 id="cast-title" class="h5">В ролях и съёмочная группа</h2>
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+        {% for credit in cast %}
+          <div class="col"><a class="d-flex align-items-center gap-2 text-reset text-decoration-none" href="{{ credit.person.get_absolute_url }}">
+            {% if credit.person.photo %}<img class="person-photo" src="{{ credit.person.photo.url }}" alt="">{% else %}<span class="avatar avatar--md avatar--letter">{{ credit.person.full_name|slice:":1" }}</span>{% endif %}
+            <span><span class="fw-semibold d-block">{{ credit.person.full_name }}</span><span class="small text-secondary">{{ credit.character_name|default:"актёр" }}</span></span></a></div>
+        {% endfor %}
+        {% for credit in crew %}
+          <div class="col"><a class="d-flex align-items-center gap-2 text-reset text-decoration-none" href="{{ credit.person.get_absolute_url }}">
+            {% if credit.person.photo %}<img class="person-photo" src="{{ credit.person.photo.url }}" alt="">{% else %}<span class="avatar avatar--md avatar--letter">{{ credit.person.full_name|slice:":1" }}</span>{% endif %}
+            <span><span class="fw-semibold d-block">{{ credit.person.full_name }}</span><span class="small text-secondary">{{ credit.get_role_display }}</span></span></a></div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+  </div>
+</article>
+
+<section class="mt-5" aria-labelledby="reviews-title">
+  <h2 id="reviews-title" class="h4 mb-3">Отзывы зрителей</h2>
+  <div class="review-form-block no-print">
+  {% if user.is_authenticated %}
+    {% if form %}
+      <form class="widget mb-4" method="post" novalidate>
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-sm-3">
+            <label class="form-label" for="{{ form.rating.id_for_label }}">Оценка</label>
+            {{ form.rating }}
+            {% for error in form.rating.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+          <div class="col-sm-9">
+            <label class="form-label" for="{{ form.text.id_for_label }}">Отзыв</label>
+            {{ form.text }}
+            {% for error in form.text.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+        </div>
+        <button class="btn btn-accent mt-3" type="submit">Отправить отзыв</button>
+      </form>
+    {% elif user_review %}
+      <p class="text-secondary">Вы оценили фильм на {{ user_review.rating }}/10.
+        {% if user_review.is_editable %}<a href="{% url 'review-edit' user_review.pk %}">Изменить</a> · <a href="{% url 'review-delete' user_review.pk %}">Удалить</a> (в течение 24 часов){% endif %}
+        {% if not user_review.is_approved %}Отзыв скрыт модератором.{% endif %}</p>
+    {% endif %}
+  {% else %}
+    <p class="text-secondary"><a href="{% url 'login' %}?next={{ request.path }}">Войдите</a>, чтобы оставить отзыв.</p>
+  {% endif %}
+  </div>
+  {% for review in reviews %}
+    <article class="review mb-3" id="review-{{ review.pk }}">
+      <header class="d-flex align-items-center gap-2 flex-wrap">{% avatar review.user 'sm' %}<b>{{ review.user|display_name }}</b><span class="rating">★ {{ review.rating }}</span><span class="small text-secondary ms-auto">{{ review.created_at|date:"d.m.Y H:i" }}</span></header>
+      <p class="mb-0 mt-2">{{ review.text }}</p>
+    </article>
+  {% empty %}
+    <p class="text-secondary">Отзывов пока нет. Будьте первым!</p>
+  {% endfor %}
+</section>
+
+{% if similar %}
+<section class="mt-5 similar-block no-print" aria-labelledby="similar-title">
+  <h2 id="similar-title" class="h4 mb-3">Похожие фильмы</h2>
+  <div class="row row-cols-2 row-cols-md-4 g-3">{% for movie in similar %}<div class="col">{% include 'cinema/_movie_card.html' %}</div>{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}

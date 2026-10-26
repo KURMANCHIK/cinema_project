@@ -1,0 +1,13 @@
+{% extends 'cinema/base.html' %}
+{% block title %}{% if object %}Изменение фильма{% else %}Новый фильм{% endif %}{% endblock %}
+{% block content %}
+<nav aria-label="Навигационная цепочка"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'manage-movies' %}">Управление фильмами</a></li><li class="breadcrumb-item active" aria-current="page">{% if object %}{{ object.title }}{% else %}Новый фильм{% endif %}</li></ol></nav>
+<h1 class="h2 mb-3">{% if object %}Изменение фильма «{{ object.title }}»{% else %}Добавление фильма{% endif %}</h1>
+<form class="widget" method="post" enctype="multipart/form-data" novalidate style="max-width:820px">
+  {% include 'cinema/_form.html' %}
+  <div class="d-flex gap-2">
+    <button class="btn btn-accent" type="submit">{% if object %}Сохранить изменения{% else %}Добавить фильм{% endif %}</button>
+    <a class="btn btn-outline-light" href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'manage-movies' %}{% endif %}">Отмена</a>
+  </div>
+</form>
+{% endblock %}

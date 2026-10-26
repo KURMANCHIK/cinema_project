@@ -1,0 +1,159 @@
+{% extends 'cinema/base.html' %}
+{% load cinema_extras %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+<section class="hero mb-4" aria-labelledby="hero-title">
+  <div class="row align-items-center g-4">
+    <div class="col-lg-7">
+      <h1 id="hero-title" class="display-6 mb-3">Кино на любой вечер</h1>
+      <p class="lead text-secondary mb-4">Новинки, классика и премьеры недели. Ищите по названию, жанру и стране, сохраняйте в избранное и смотрите по подписке.</p>
+      <form class="d-flex gap-2" role="search" action="{% url 'catalog' %}">
+        <label for="hero-search" class="visually-hidden">Название или описание фильма</label>
+        <input id="hero-search" class="form-control form-control-lg" type="search" name="q" placeholder="Например, «Интерстеллар»">
+        <button class="btn btn-accent btn-lg px-4" type="submit"><i class="bi bi-search" aria-hidden="true"></i><span class="visually-hidden">Найти</span></button>
+      </form>
+    </div>
+    <div class="col-lg-5">
+      <div class="row g-2" aria-label="Статистика кинотеатра">
+        <div class="col-6"><div class="stat-card"><div class="value">{{ stats.movies }}</div><div class="label">фильмов в каталоге</div></div></div>
+        <div class="col-6"><div class="stat-card"><div class="value">{{ stats.views }}</div><div class="label">просмотров</div></div></div>
+        <div class="col-6"><div class="stat-card"><div class="value">{{ stats.persons }}</div><div class="label">актёров и режиссёров</div></div></div>
+        <div class="col-6"><div class="stat-card"><div class="value">{{ stats.avg_duration }} мин</div><div class="label">средняя длительность</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mb-4" aria-labelledby="w-new">
+  <div class="d-flex justify-content-between align-items-baseline mb-3">
+    <h2 id="w-new" class="widget-title mb-0"><i class="bi bi-stars" aria-hidden="true"></i> Новинки месяца</h2>
+    <a href="{% url 'catalog' %}?sort=new">Все новинки →</a>
+  </div>
+  <div class="row row-cols-2 row-cols-md-4 g-3">
+    {% for movie in new_releases %}<div class="col">{% include 'cinema/_movie_card.html' %}</div>{% empty %}<p class="text-secondary">За последние 30 дней новинок нет.</p>{% endfor %}
+  </div>
+</section>
+
+<section class="mb-4" aria-labelledby="w-popular">
+  <div class="d-flex justify-content-between align-items-baseline mb-3">
+    <h2 id="w-popular" class="widget-title mb-0"><i class="bi bi-fire" aria-hidden="true"></i> Популярное сейчас</h2>
+    <a href="{% url 'catalog' %}?sort=popular">Весь каталог →</a>
+  </div>
+  <div class="row row-cols-2 row-cols-md-4 g-3">
+    {% for movie in popular %}<div class="col">{% include 'cinema/_movie_card.html' %}</div>{% endfor %}
+  </div>
+</section>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <section class="widget" aria-labelledby="w-soon">
+      <h2 id="w-soon" class="widget-title"><i class="bi bi-calendar-event" aria-hidden="true"></i> Календарь премьер</h2>
+      <ul class="list-plain">
+        {% for movie in coming_soon %}
+          <li class="d-flex align-items-center gap-3">
+            <span class="date-chip"><span class="day">{{ movie.premiere_date|date:"d" }}</span><span class="month">{{ movie.premiere_date|date:"M" }}</span></span>
+            <div class="flex-grow-1">
+              <a href="{{ movie.get_absolute_url }}" class="fw-semibold">{{ movie.title }}</a>
+              <div class="small text-secondary">{% if movie.category %}{{ movie.category.name }} · {% endif %}через {{ movie.days_until_premiere }} дн.</div>
+            </div>
+          </li>
+        {% empty %}
+          <li class="text-secondary">Ближайших премьер пока нет.</li>
+        {% endfor %}
+      </ul>
+      <a class="btn btn-sm btn-outline-accent mt-2" href="{{ month_url }}">Премьеры этого месяца</a>
+    </section>
+  </div>
+  <div class="col-lg-6">
+    <section class="widget" aria-labelledby="w-top">
+      <h2 id="w-top" class="widget-title"><i class="bi bi-trophy" aria-hidden="true"></i> Лучшие по оценкам зрителей</h2>
+      <ol class="list-plain">
+        {% for movie in top_rated %}
+          <li class="d-flex align-items-center gap-3">
+            <span class="fs-4 fw-bold text-secondary" style="width:1.6rem">{{ forloop.counter }}</span>
+            <div class="flex-grow-1"><a href="{{ movie.get_absolute_url }}" class="fw-semibold">{{ movie.title }}</a>
+              <div class="small text-secondary">{{ movie.release_year }} · {{ movie.reviews_count }} отз.</div></div>
+            <span class="rating"><i class="bi bi-star-fill" aria-hidden="true"></i> {{ movie.avg_rating|floatformat:1 }}</span>
+          </li>
+        {% endfor %}
+      </ol>
+    </section>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-5">
+    <section class="widget" aria-labelledby="w-genres">
+      <h2 id="w-genres" class="widget-title"><i class="bi bi-tags" aria-hidden="true"></i> Жанры</h2>
+      {% for genre in genres %}
+        <a class="genre-pill" href="{% url 'catalog' %}?genre={{ genre.id }}">{{ genre.name }} <span class="badge rounded-pill">{{ genre.total }}</span></a>
+      {% endfor %}
+    </section>
+  </div>
+  <div class="col-lg-7">
+    <section class="widget" aria-labelledby="w-stars">
+      <h2 id="w-stars" class="widget-title"><i class="bi bi-person-video2" aria-hidden="true"></i> Звёзды каталога</h2>
+      <div class="row row-cols-2 row-cols-md-3 g-3">
+        {% for person in stars %}
+          <div class="col">
+            <a class="d-flex align-items-center gap-2 text-decoration-none text-reset" href="{{ person.get_absolute_url }}">
+              {% if person.photo %}<img class="person-photo" src="{{ person.photo.url }}" alt="">{% else %}<span class="avatar avatar--md avatar--letter">{{ person.full_name|slice:":1" }}</span>{% endif %}
+              <span><span class="fw-semibold d-block">{{ person.full_name }}</span><span class="small text-secondary">{{ person.total }} фильм.</span></span>
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</div>
+
+<section class="mb-4" aria-labelledby="w-free">
+  <div class="d-flex justify-content-between align-items-baseline mb-3">
+    <h2 id="w-free" class="widget-title mb-0"><i class="bi bi-gift" aria-hidden="true"></i> Смотреть бесплатно</h2>
+    <a href="{% url 'catalog' %}?free=1">Все бесплатные →</a>
+  </div>
+  <div class="row row-cols-2 row-cols-md-4 g-3">
+    {% for movie in free_movies %}<div class="col">{% include 'cinema/_movie_card.html' %}</div>{% endfor %}
+  </div>
+</section>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <section class="widget" aria-labelledby="w-plans">
+      <h2 id="w-plans" class="widget-title"><i class="bi bi-ticket-perforated" aria-hidden="true"></i> Подписка</h2>
+      {% if subscription %}
+        <p class="mb-3">Ваша подписка «{{ subscription.plan.name }}» активна ещё <b>{{ subscription.days_left }} дн.</b></p>
+      {% endif %}
+      <div class="row g-3">
+        {% for plan in plans %}
+          <div class="col-6 col-xl-3">
+            <div class="plan-card">
+              <div class="fw-semibold">{{ plan.name }}</div>
+              <div class="price">{{ plan.price|floatformat:0 }} ₽</div>
+              <div class="small text-secondary mb-2">{{ plan.duration_days }} дн. · {{ plan.price_per_day }} ₽ в день</div>
+              {% if user.is_authenticated %}
+                <form method="post" action="{% url 'subscribe' plan.pk %}">{% csrf_token %}<button class="btn btn-sm btn-accent w-100">{% if subscription %}Продлить{% else %}Оформить{% endif %}</button></form>
+              {% else %}
+                <a class="btn btn-sm btn-outline-light w-100" href="{% url 'login' %}?next={{ request.path }}">Войти и оформить</a>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+  <div class="col-lg-5">
+    <section class="widget" aria-labelledby="w-reviews">
+      <h2 id="w-reviews" class="widget-title"><i class="bi bi-chat-quote" aria-hidden="true"></i> Свежие отзывы</h2>
+      <ul class="list-plain">
+        {% for review in fresh_reviews %}
+          <li>
+            <div class="d-flex align-items-center gap-2 mb-1">{% avatar review.user 'sm' %}<b>{{ review.user|display_name }}</b><span class="rating ms-auto">★ {{ review.rating }}</span></div>
+            <div class="small">о фильме <a href="{{ review.get_absolute_url }}">{{ review.movie.title }}</a>: «{{ review.text|truncatechars:80 }}»</div>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% load static cinema_extras %}<!DOCTYPE html>
+<html lang="ru" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{% block title %}Онлайн-кинотеатр{% endblock %} · Cinema</title>
+  <link rel="stylesheet" href="{% static 'cinema/vendor/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'cinema/vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+  <link rel="stylesheet" href="{% static 'cinema/css/style.css' %}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти к основному содержимому</a>
+
+  <div id="a11y-toolbar" class="no-print" role="region" aria-label="Настройки для слабовидящих" hidden>
+    <div class="container py-2 d-flex flex-wrap align-items-center gap-2">
+      <div class="a11y-group" role="group" aria-label="Размер шрифта">
+        <span>Шрифт:</span>
+        <button type="button" class="btn btn-sm btn-light" data-a11y-font="1">A</button>
+        <button type="button" class="btn btn-sm btn-light fs-6" data-a11y-font="1.25">A+</button>
+        <button type="button" class="btn btn-sm btn-light fs-5" data-a11y-font="1.5">A++</button>
+      </div>
+      <div class="a11y-group" role="group" aria-label="Цветовая схема">
+        <span>Цвета:</span>
+        <button type="button" class="btn btn-sm btn-light" data-a11y-theme="">Обычная</button>
+        <button type="button" class="btn btn-sm a11y-swatch-bw" data-a11y-theme="bw">Чёрное на белом</button>
+        <button type="button" class="btn btn-sm a11y-swatch-wb" data-a11y-theme="wb">Жёлтое на чёрном</button>
+        <button type="button" class="btn btn-sm a11y-swatch-blue" data-a11y-theme="blue">Синяя</button>
+      </div>
+      <div class="a11y-group" role="group" aria-label="Дополнительно">
+        <button type="button" class="btn btn-sm btn-light" data-a11y-toggle="spacing" aria-pressed="false">Интервал</button>
+        <button type="button" class="btn btn-sm btn-light" data-a11y-toggle="hide-images" aria-pressed="false">Без картинок</button>
+        <button type="button" class="btn btn-sm btn-light" id="a11y-speak"><i class="bi bi-volume-up" aria-hidden="true"></i> Озвучить</button>
+        <button type="button" class="btn btn-sm btn-outline-light" id="a11y-reset">Сбросить</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="no-print">
+    <nav class="navbar navbar-expand-lg site-nav sticky-top" aria-label="Главное меню">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'home' %}"><i class="bi bi-film text-accent" aria-hidden="true"></i> Cinema</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Открыть меню">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+          {% with current=request.resolver_match.url_name %}
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item"><a class="nav-link {% if current == 'home' %}active{% endif %}" {% if current == 'home' %}aria-current="page"{% endif %} href="{% url 'home' %}">Главная</a></li>
+            <li class="nav-item"><a class="nav-link {% if current == 'catalog' %}active{% endif %}" {% if current == 'catalog' %}aria-current="page"{% endif %} href="{% url 'catalog' %}">Каталог</a></li>
+            <li class="nav-item"><a class="nav-link {% if current == 'premieres-by-month' %}active{% endif %}" href="{% now 'Y' as y %}{% now 'm' as m %}{% url 'premieres-by-month' y m %}">Премьеры</a></li>
+            {% if user.is_authenticated %}
+              <li class="nav-item"><a class="nav-link {% if current == 'favorites' %}active{% endif %}" href="{% url 'favorites' %}">Избранное</a></li>
+            {% endif %}
+            {% if user.is_staff %}
+              <li class="nav-item"><a class="nav-link {% if current == 'manage-movies' %}active{% endif %}" href="{% url 'manage-movies' %}">Управление</a></li>
+              <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Админка</a></li>
+            {% endif %}
+          </ul>
+          {% endwith %}
+          <form class="d-flex me-lg-2 my-2 my-lg-0 nav-search" role="search" action="{% url 'catalog' %}">
+            <label for="nav-search" class="visually-hidden">Поиск фильмов</label>
+            <input id="nav-search" class="form-control form-control-sm" type="search" name="q" placeholder="Найти фильм" value="{{ request.GET.q }}">
+          </form>
+          <div class="d-flex align-items-center gap-2 flex-wrap flex-lg-nowrap text-nowrap">
+            <button type="button" class="btn btn-sm btn-outline-light" id="a11y-open" aria-controls="a11y-toolbar" aria-expanded="false" title="Версия для слабовидящих">
+              <i class="bi bi-eye" aria-hidden="true"></i><span class="d-lg-none"> Для слабовидящих</span><span class="visually-hidden"> — версия для слабовидящих</span>
+            </button>
+            {% if user.is_authenticated %}
+              <a class="user-chip" href="{% url 'profile' %}">{% avatar user 'sm' %}<span>{{ user|display_name }}</span></a>
+              <form method="post" action="{% url 'logout' %}" class="m-0">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-link link-secondary" type="submit">Выйти</button>
+              </form>
+            {% else %}
+              <a class="btn btn-sm btn-outline-light" href="{% url 'login' %}">Войти</a>
+              <a class="btn btn-sm btn-accent" href="{% url 'register' %}">Регистрация</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main" class="container py-4" tabindex="-1">
+    <div aria-live="polite" class="no-print">
+      {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+        </div>
+      {% endfor %}
+    </div>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer no-print">
+    <div class="container d-flex flex-wrap justify-content-between gap-2 py-4">
+      <span>© {% now 'Y' %} Cinema — онлайн-кинотеатр. Курсовой проект, Московский Политех.</span>
+      <span><a href="{% url 'catalog' %}">Каталог</a> · <a href="{% url 'swagger-ui' %}">API</a></span>
+    </div>
+  </footer>
+
+  <script src="{% static 'cinema/vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'cinema/js/site.js' %}"></script>
+</body>
+</html>

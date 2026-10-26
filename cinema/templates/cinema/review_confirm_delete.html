@@ -1,0 +1,8 @@
+{% extends 'cinema/base.html' %}
+{% block title %}Удаление отзыва{% endblock %}
+{% block content %}
+<div class="widget" style="max-width:560px">
+  <h1 class="h4">Удалить ваш отзыв о фильме «{{ object.movie.title }}»?</h1>
+  <form method="post" class="d-flex gap-2 mt-3">{% csrf_token %}<button class="btn btn-danger">Удалить</button><a class="btn btn-outline-light" href="{{ object.movie.get_absolute_url }}">Отмена</a></form>
+</div>
+{% endblock %}

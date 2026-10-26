@@ -1,0 +1,10 @@
+{% extends 'cinema/base.html' %}
+{% block title %}Избранное{% endblock %}
+{% block content %}
+<h1 class="h2 mb-3">Избранное</h1>
+{% if movies %}
+  <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">{% for movie in movies %}<div class="col">{% include 'cinema/_movie_card.html' %}</div>{% endfor %}</div>
+{% else %}
+  <p class="text-secondary">Вы ещё ничего не добавили. Нажмите на сердечко на карточке фильма.</p>
+{% endif %}
+{% endblock %}

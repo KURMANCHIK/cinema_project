@@ -1,0 +1,28 @@
+{% extends 'cinema/base.html' %}
+{% block title %}{{ person.full_name }}{% endblock %}
+{% block content %}
+<nav aria-label="Навигационная цепочка"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="{% url 'home' %}">Главная</a></li><li class="breadcrumb-item active" aria-current="page">{{ person.full_name }}</li></ol></nav>
+<div class="d-flex flex-wrap gap-4 align-items-center mb-4">
+  {% if person.photo %}<img src="{{ person.photo.url }}" alt="Фото: {{ person.full_name }}" class="rounded-circle" width="128" height="128" style="object-fit:cover">{% else %}<span class="avatar avatar--lg avatar--letter">{{ person.full_name|slice:":1" }}</span>{% endif %}
+  <div>
+    <h1 class="h2 mb-1">{{ person.full_name }}</h1>
+    {% if person.birth_date %}<p class="text-secondary mb-1">Родился(ась) {{ person.birth_date|date:"j E Y" }} · {{ person.age }} лет</p>{% endif %}
+    {% if person.wiki_url %}<a href="{{ person.wiki_url }}" target="_blank" rel="noopener">Статья в Википедии</a>{% endif %}
+  </div>
+</div>
+{% if person.biography %}<p class="mb-4">{{ person.biography }}</p>{% endif %}
+<h2 class="h4">Фильмография</h2>
+<div class="table-responsive">
+<table class="table align-middle">
+  <caption class="visually-hidden">Фильмы с участием {{ person.full_name }}</caption>
+  <thead><tr><th scope="col">Год</th><th scope="col">Фильм</th><th scope="col">Жанр</th><th scope="col">Роль</th></tr></thead>
+  <tbody>
+    {% for credit in credits %}
+      <tr><td>{{ credit.movie.release_year }}</td><td><a href="{{ credit.movie.get_absolute_url }}">{{ credit.movie.title }}</a></td><td>{{ credit.movie.category.name|default:"—" }}</td><td>{{ credit.get_role_display }}{% if credit.character_name %} — {{ credit.character_name }}{% endif %}</td></tr>
+    {% empty %}
+      <tr><td colspan="4" class="text-secondary">Фильмов пока нет.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

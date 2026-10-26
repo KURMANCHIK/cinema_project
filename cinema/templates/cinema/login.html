@@ -1,0 +1,14 @@
+{% extends 'cinema/base.html' %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<div class="auth-box widget">
+  <h1 class="h3 mb-3">Вход</h1>
+  <form method="post" novalidate>
+    {% include 'cinema/_form.html' %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="btn btn-accent w-100" type="submit">Войти</button>
+  </form>
+  {% include 'cinema/_google_button.html' %}
+  <p class="text-secondary mt-3 mb-0">Нет аккаунта? <a href="{% url 'register' %}">Зарегистрируйтесь</a></p>
+</div>
+{% endblock %}

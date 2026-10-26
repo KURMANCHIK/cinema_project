@@ -1,0 +1,13 @@
+{% extends 'cinema/base.html' %}
+{% block title %}Удаление фильма{% endblock %}
+{% block content %}
+<div class="widget" style="max-width:640px">
+  <h1 class="h3">Удалить фильм «{{ object.title }}»?</h1>
+  <p>Вместе с фильмом удалятся отзывы ({{ reviews_total }}) и записи о съёмочной группе ({{ credits_total }}). Действие нельзя отменить.</p>
+  <form method="post" class="d-flex gap-2">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Да, удалить</button>
+    <a class="btn btn-outline-light" href="{% url 'manage-movies' %}">Отмена</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'cinema/base.html' %}
+{% block title %}Управление фильмами{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h2 mb-0">Управление фильмами</h1>
+  <a class="btn btn-accent" href="{% url 'movie-create' %}"><i class="bi bi-plus-lg" aria-hidden="true"></i> Добавить фильм</a>
+</div>
+<p class="text-secondary">Всего фильмов: {{ paginator.count }}. Новые фильмы показаны первыми.</p>
+<div class="table-responsive">
+<table class="table table-hover align-middle">
+  <caption class="visually-hidden">Список фильмов с кнопками управления</caption>
+  <thead><tr><th scope="col">Фильм</th><th scope="col">Жанр</th><th scope="col">Год</th><th scope="col">Статус</th><th scope="col">Отзывов</th><th scope="col" class="text-end">Действия</th></tr></thead>
+  <tbody>
+  {% for movie in movies %}
+    <tr>
+      <td><a href="{{ movie.get_absolute_url }}" class="fw-semibold">{{ movie.title }}</a></td>
+      <td>{{ movie.category.name|default:"—" }}</td>
+      <td>{{ movie.release_year }}</td>
+      <td>{% if movie.status == 'published' %}<span class="badge text-bg-success">Опубликован</span>{% else %}<span class="badge text-bg-secondary">Черновик</span>{% endif %}</td>
+      <td>{{ movie.reviews_total }}</td>
+      <td class="text-end text-nowrap">
+        <a class="btn btn-sm btn-outline-light" href="{{ movie.get_absolute_url }}">Открыть</a>
+        <a class="btn btn-sm btn-outline-warning" href="{% url 'movie-edit' movie.pk %}">Изменить</a>
+        <a class="btn btn-sm btn-outline-danger" href="{% url 'movie-delete' movie.pk %}">Удалить</a>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% if is_paginated %}
+<nav aria-label="Страницы списка"><ul class="pagination">
+  {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a></li>{% endif %}
+  <li class="page-item active"><span class="page-link">{{ page_obj.number }} из {{ paginator.num_pages }}</span></li>
+  {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперёд</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

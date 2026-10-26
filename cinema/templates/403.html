@@ -1,0 +1,10 @@
+{% extends 'cinema/base.html' %}
+{% block title %}Доступ запрещён{% endblock %}
+{% block content %}
+<div class="widget text-center py-5" style="max-width:640px;margin:0 auto">
+  <div class="display-4 fw-bold text-accent">403</div>
+  <h1 class="h3">Доступ запрещён</h1>
+  <p class="text-secondary">У вас нет прав на это действие. Управлять фильмами могут только сотрудники кинотеатра.</p>
+  <a class="btn btn-accent" href="{% url 'home' %}">На главную</a>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'cinema/base.html' %}
+{% block title %}Премьеры: {{ title }}{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+  <h1 class="h2 mb-0">Премьеры: {{ title }}</h1>
+  <div class="btn-group" role="group" aria-label="Переключение месяца">
+    <a class="btn btn-outline-light" href="{{ prev_url }}">← Предыдущий месяц</a>
+    <a class="btn btn-outline-light" href="{{ next_url }}">Следующий месяц →</a>
+  </div>
+</div>
+{% if movies %}
+  <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+    {% for movie in movies %}
+      <div class="col">
+        <p class="small text-secondary mb-1"><i class="bi bi-calendar3" aria-hidden="true"></i> {{ movie.premiere_date|date:"j E" }}</p>
+        {% include 'cinema/_movie_card.html' %}
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-secondary">В этом месяце премьер нет.</p>
+{% endif %}
+{% endblock %}

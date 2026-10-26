@@ -1,0 +1,14 @@
+{% load socialaccount %}
+{% if google_auth_enabled %}
+  <div class="divider no-print"><span>или</span></div>
+  <form method="post" action="{% provider_login_url 'google' process='login' %}">
+    {% csrf_token %}
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    <button class="btn btn--google" type="submit">
+      {% include 'cinema/_google_icon.html' %}
+      Войти через Google
+    </button>
+  </form>
+{% elif show_setup_hints %}
+  <p class="setup-hint">Вход через Google не настроен: в <code>.env</code> пустые <code>GOOGLE_CLIENT_ID</code> или <code>GOOGLE_CLIENT_SECRET</code>. После правки перезапустите сервер.</p>
+{% endif %}

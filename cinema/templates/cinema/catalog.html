@@ -1,0 +1,63 @@
+{% extends 'cinema/base.html' %}
+{% block title %}Каталог{% endblock %}
+{% block content %}
+<h1 class="h2 mb-3">Каталог фильмов</h1>
+<form class="widget mb-4" method="get" aria-label="Поиск и фильтры">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label small" for="f-q">Поиск по названию и описанию</label>
+      <input id="f-q" class="form-control" type="search" name="q" value="{{ query }}" placeholder="Например, Матрица">
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small" for="f-genre">Жанр</label>
+      <select id="f-genre" class="form-select" name="genre">
+        <option value="">Все</option>
+        {% for genre in genres %}<option value="{{ genre.pk }}" {% if params.genre == genre.pk|stringformat:"s" %}selected{% endif %}>{{ genre.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small" for="f-country">Страна</label>
+      <select id="f-country" class="form-select" name="country">
+        <option value="">Все</option>
+        {% for country in countries %}<option value="{{ country.code }}" {% if params.country == country.code %}selected{% endif %}>{{ country.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-6 col-md-2">
+      <label class="form-label small" for="f-sort">Сортировка</label>
+      <select id="f-sort" class="form-select" name="sort">
+        <option value="popular" {% if sort == 'popular' %}selected{% endif %}>Популярные</option>
+        <option value="rating" {% if sort == 'rating' %}selected{% endif %}>По рейтингу</option>
+        <option value="new" {% if sort == 'new' %}selected{% endif %}>Новые премьеры</option>
+        <option value="year" {% if sort == 'year' %}selected{% endif %}>По году выпуска</option>
+        <option value="title" {% if sort == 'title' %}selected{% endif %}>По названию</option>
+      </select>
+    </div>
+    <div class="col-6 col-md-2 d-grid"><button class="btn btn-accent" type="submit">Найти</button></div>
+  </div>
+  <div class="d-flex flex-wrap gap-3 mt-3 small">
+    <div class="form-check"><input class="form-check-input" type="checkbox" name="match_case" value="1" id="f-case" {% if match_case %}checked{% endif %}><label class="form-check-label" for="f-case">Учитывать регистр</label></div>
+    <div class="form-check"><input class="form-check-input" type="checkbox" name="free" value="1" id="f-free" {% if params.free %}checked{% endif %}><label class="form-check-label" for="f-free">Только бесплатные</label></div>
+    <div class="form-check"><input class="form-check-input" type="checkbox" name="no_adult" value="1" id="f-adult" {% if params.no_adult %}checked{% endif %}><label class="form-check-label" for="f-adult">Без фильмов 18+</label></div>
+    <a class="ms-auto" href="{% url 'catalog' %}">Сбросить фильтры</a>
+  </div>
+</form>
+
+<p class="text-secondary small">Найдено: {{ paginator.count }}</p>
+{% if movies %}
+  <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+    {% for movie in movies %}<div class="col">{% include 'cinema/_movie_card.html' %}</div>{% endfor %}
+  </div>
+{% else %}
+  <p class="text-secondary py-4">Ничего не найдено. Попробуйте изменить условия поиска.</p>
+{% endif %}
+
+{% if is_paginated %}
+<nav class="mt-4" aria-label="Страницы каталога">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?{{ querystring }}&page={{ page_obj.previous_page_number }}">Назад</a></li>{% endif %}
+    <li class="page-item active" aria-current="page"><span class="page-link">{{ page_obj.number }} из {{ paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?{{ querystring }}&page={{ page_obj.next_page_number }}">Вперёд</a></li>{% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}

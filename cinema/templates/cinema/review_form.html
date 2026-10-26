@@ -1,0 +1,10 @@
+{% extends 'cinema/base.html' %}
+{% block title %}Изменение отзыва{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Изменение отзыва о фильме «{{ object.movie.title }}»</h1>
+<form class="widget" method="post" novalidate style="max-width:640px">
+  {% include 'cinema/_form.html' %}
+  <button class="btn btn-accent" type="submit">Сохранить</button>
+  <a class="btn btn-outline-light" href="{{ object.movie.get_absolute_url }}">Отмена</a>
+</form>
+{% endblock %}

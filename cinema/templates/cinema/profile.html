@@ -1,0 +1,70 @@
+{% extends 'cinema/base.html' %}
+{% load cinema_extras socialaccount %}
+{% block title %}Профиль{% endblock %}
+{% block content %}
+<section class="d-flex flex-wrap align-items-center gap-4 mb-4">
+  {% avatar user 'lg' %}
+  <div>
+    <h1 class="h2 mb-1">{{ user|display_name }}</h1>
+    <p class="text-secondary mb-0">@{{ user.username }}{% if user.email %} · {{ user.email }}{% endif %} · с нами с {{ user.date_joined|date:"d.m.Y" }}</p>
+  </div>
+</section>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3"><div class="stat-card"><div class="value">{{ reviews_count }}</div><div class="label">отзывов</div></div></div>
+  <div class="col-6 col-md-3"><a class="text-decoration-none text-reset" href="{% url 'favorites' %}"><div class="stat-card"><div class="value">{{ favorites_count }}</div><div class="label">в избранном</div></div></a></div>
+  <div class="col-6 col-md-3"><div class="stat-card"><div class="value">{{ playlists|length }}</div><div class="label">плейлистов</div></div></div>
+  <div class="col-6 col-md-3"><div class="stat-card"><div class="value">{% if subscription %}{{ subscription.days_left }}{% else %}0{% endif %}</div><div class="label">дней подписки осталось</div></div></div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <section class="widget" id="plans" aria-labelledby="sub-title">
+      <h2 id="sub-title" class="widget-title"><i class="bi bi-ticket-perforated" aria-hidden="true"></i> Подписка</h2>
+      {% if subscription %}
+        <p>Тариф <b>{{ subscription.plan.name }}</b> действует до <b>{{ subscription.expires_at|date:"d.m.Y H:i" }}</b> (осталось {{ subscription.days_left }} дн.).</p>
+      {% else %}
+        <p class="text-secondary">Активной подписки нет. Фильмы с отметкой «По подписке» недоступны.</p>
+      {% endif %}
+      <div class="row g-2">
+        {% for plan in plans %}
+          <div class="col-md-4"><div class="plan-card"><div class="fw-semibold">{{ plan.name }}</div><div class="price">{{ plan.price|floatformat:0 }} ₽</div><div class="small text-secondary mb-2">{{ plan.duration_days }} дн.</div>
+            <form method="post" action="{% url 'subscribe' plan.pk %}">{% csrf_token %}<button class="btn btn-sm btn-accent w-100">{% if subscription %}Продлить{% else %}Оформить{% endif %}</button></form></div></div>
+        {% endfor %}
+      </div>
+      {% if history %}
+        <h3 class="h6 mt-3">История подписок</h3>
+        <ul class="list-plain small">{% for item in history %}<li>{{ item.plan.name }}: {{ item.started_at|date:"d.m.Y" }} — {{ item.expires_at|date:"d.m.Y" }} · {{ item.price_paid|floatformat:0 }} ₽{% if item.is_active %} · <span class="text-success">активна</span>{% endif %}</li>{% endfor %}</ul>
+      {% endif %}
+    </section>
+  </div>
+  <div class="col-lg-6">
+    <section class="widget h-auto mb-4" aria-labelledby="g-title">
+      <h2 id="g-title" class="widget-title"><i class="bi bi-google" aria-hidden="true"></i> Google-аккаунт</h2>
+      {% if google_account %}
+        <div class="d-flex align-items-center gap-3 mb-3">{% avatar user 'md' %}<div><b>{{ google_name|default:"Google" }}</b><div class="small text-secondary">{{ google_email }}</div></div><span class="badge text-bg-success ms-auto">Привязан</span></div>
+        {% if can_disconnect %}
+          <form method="post" action="{% url 'google-disconnect' %}">{% csrf_token %}<button class="btn btn-outline-accent" type="submit">Отвязать Google</button></form>
+        {% else %}
+          <p class="text-secondary small">Вы вошли через Google и ещё не задали пароль. Чтобы отвязать Google, сначала <a href="{% url 'account_set_password' %}">задайте пароль</a>.</p>
+        {% endif %}
+      {% elif google_auth_enabled %}
+        <p class="text-secondary">Привяжите Google, чтобы входить в один клик.</p>
+        <form method="post" action="{% provider_login_url 'google' process='connect' next='/profile/' %}">{% csrf_token %}<button class="btn btn--google btn--auto" type="submit">{% include 'cinema/_google_icon.html' %} Привязать Google</button></form>
+      {% else %}
+        <p class="text-secondary">Вход через Google не настроен.</p>
+      {% endif %}
+    </section>
+    <section class="widget h-auto" aria-labelledby="r-title">
+      <h2 id="r-title" class="widget-title"><i class="bi bi-chat-left-text" aria-hidden="true"></i> Мои отзывы</h2>
+      <ul class="list-plain">
+        {% for review in reviews %}
+          <li><a href="{{ review.get_absolute_url }}">{{ review.movie.title }}</a> <span class="rating">★ {{ review.rating }}</span> <span class="text-secondary small">— {{ review.text|truncatechars:70 }}</span></li>
+        {% empty %}
+          <li class="text-secondary">Вы ещё не оставили ни одного отзыва.</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+{% endblock %}
